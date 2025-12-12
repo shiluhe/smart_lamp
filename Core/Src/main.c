@@ -54,12 +54,27 @@ float output_voltage = 0.0f;
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
 uint16_t adc_buffer[1];
+void delay_us(uint32_t nus)
+{
+ 
+ uint16_t  differ = 0xffff-nus-5;
+
+  __HAL_TIM_SetCounter(&htim2,differ);
+
+  HAL_TIM_Base_Start(&htim2);
+ 
+  while( differ<0xffff-5)
+ {
+  differ = __HAL_TIM_GetCounter(&htim2);
+ };
+  HAL_TIM_Base_Stop(&htim2);
+}
 /* USER CODE END 0 */
 
 /**
@@ -94,6 +109,7 @@ int main(void)
   MX_DMA_Init();
   MX_TIM1_Init();
   MX_ADC1_Init();
+  MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
 	HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_1);
 	HAL_ADC_Start_DMA(&hadc1, (uint32_t *) adc_buffer, 1);
@@ -107,8 +123,9 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 		//__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_1,1440);
-		
-		//HAL_Delay(5);
+				PI_Control(output_voltage);
+				HAL_Delay(1);
+				//delay_us(500);
 	
   }
   /* USER CODE END 3 */
@@ -167,8 +184,7 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef * hadc){
 
         uint16_t avg = adc_buffer[0];
         output_voltage = calculate(avg);
-				PI_Control(output_voltage);
-
+			
 		}
     HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adc_buffer, 1);
 }

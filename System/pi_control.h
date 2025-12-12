@@ -1,6 +1,6 @@
 #include "adc.h"
 
-#define VREF              3.3f
+#define VREF              3.41f
 #define ADC_MAX           4095.0f
 #define R1                10000.0f
 #define R2                50000.0f

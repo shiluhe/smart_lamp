@@ -33,4 +33,4 @@ control_class\main.o: ../Core/Inc/adc.h
 control_class\main.o: ../Core/Inc/dma.h
 control_class\main.o: ../Core/Inc/tim.h
 control_class\main.o: ../Core/Inc/gpio.h
-control_class\main.o: ..\System\pi_control.h
+control_class\main.o: ../System/pi_control.h
