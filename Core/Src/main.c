@@ -47,7 +47,7 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-float output_voltage = 0.0f;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -59,7 +59,10 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-uint16_t adc_buffer[1];
+uint16_t adc_buffer[2];
+float output_voltage = 0.0f;
+float light_value = 0.0f;
+
 void delay_us(uint32_t nus)
 {
  
@@ -112,11 +115,14 @@ int main(void)
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
 	HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_1);
-	HAL_ADC_Start_DMA(&hadc1, (uint32_t *) adc_buffer, 1);
+	HAL_ADC_Start_DMA(&hadc1, (uint32_t *) adc_buffer, 2);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+	
+	//baoshan();
+	
   while (1)
   {
     /* USER CODE END WHILE */
@@ -124,9 +130,13 @@ int main(void)
     /* USER CODE BEGIN 3 */
 		//__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_1,1440);
 				PI_Control(output_voltage);
-				HAL_Delay(1);
+				//HAL_Delay(1);
 				//delay_us(500);
-	
+		//DO_lamp();
+		//AO_lamp(light_value);
+		//huxi_changliang();
+		//HAL_Delay(1);
+		
   }
   /* USER CODE END 3 */
 }
@@ -184,9 +194,12 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef * hadc){
 
         uint16_t avg = adc_buffer[0];
         output_voltage = calculate(avg);
-			
+
+				uint16_t light_raw = adc_buffer[1];
+				light_value = (float)light_raw * VREF / ADC_MAX;
+
 		}
-    HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adc_buffer, 1);
+    HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adc_buffer, 2);
 }
 /* USER CODE END 4 */
 
