@@ -102,7 +102,7 @@ void huxi(){
 	  static float pwm_val = 0.0f;
     static float step = 72.0f;   
     pwm_val += step;
-	
+
 		float up_limit = 2880.0f * VlampUpLimit / VIN;
 		float down_limit = 2880.0f * 0 / VIN;
 

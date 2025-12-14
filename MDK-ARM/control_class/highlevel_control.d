@@ -1,6 +1,8 @@
 control_class\highlevel_control.o: ..\System\highlevel_control.c
 control_class\highlevel_control.o: ..\System\highlevel_control.h
-control_class\highlevel_control.o: ../Core/Inc/usart.h
+control_class\highlevel_control.o: D:\Keil_v5arm\ARM\ARMCC\Bin\..\include\string.h
+control_class\highlevel_control.o: ..\System\pi_control.h
+control_class\highlevel_control.o: ../Core/Inc/adc.h
 control_class\highlevel_control.o: ../Core/Inc/main.h
 control_class\highlevel_control.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h
 control_class\highlevel_control.o: ../Core/Inc/stm32f1xx_hal_conf.h
@@ -33,6 +35,5 @@ control_class\highlevel_control.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx
 control_class\highlevel_control.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h
 control_class\highlevel_control.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h
 control_class\highlevel_control.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h
-control_class\highlevel_control.o: D:\Keil_v5arm\ARM\ARMCC\Bin\..\include\string.h
-control_class\highlevel_control.o: ..\System\pi_control.h
-control_class\highlevel_control.o: ../Core/Inc/adc.h
+control_class\highlevel_control.o: ../Core/Inc/usart.h
+control_class\highlevel_control.o: ../Core/Inc/i2c.h

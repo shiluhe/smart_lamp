@@ -27,6 +27,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <stdio.h>
 #include "pi_control.h"
 #include "highlevel_control.h"
 #include "stm32f1xx_hal.h"
@@ -72,7 +73,8 @@ extern uint8_t Uart3_Rx_Cnt;
 extern char my_order[10];
 extern char receive_flag;
 
-uint8_t Voice_ID = 0;
+extern uint8_t voice_cmd_ready;
+//extern uint8_t voice_rx_buffer[5];
 
 /* USER CODE END 0 */
 
@@ -115,21 +117,20 @@ int main(void)
 	HAL_ADC_Start_DMA(&hadc1, (uint32_t *) adc_buffer, 2);
 
 	HAL_UART_Receive_IT(&huart3, (uint8_t *)&aRxBuffer, 1);
-	//HAL_I2C_Master_Transmit_IT(&hi2c1, 0x34 << 1, (uint8_t *)0x64, 1);
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-	HAL_Delay(1000);
-	esp8266_start_trans();
+	//HAL_Delay(1000);
+	//esp8266_start_trans();
 	//baoshan();
-	//esp8266_test();
   while (1)
   {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+		
 		//__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_1,1440);
 				//PI_Control(output_voltage);
 				//HAL_Delay(1);
@@ -137,12 +138,15 @@ int main(void)
 		//DO_lamp();
 		//AO_lamp(light_value);
 		//huxi_changliang();
-		HAL_Delay(1);
-		uint8_t my_mode = yaokong();
-		mode_change(my_mode);
-  /* USER CODE END 3 */
+		//HAL_Delay(1);
+		//uint8_t my_mode = yaokong();
+		//mode_change(my_mode);
+		//yuyin();
+		
 	}
+  /* USER CODE END 3 */
 }
+
 /**
   * @brief System Clock Configuration
   * @retval None
@@ -193,7 +197,6 @@ void SystemClock_Config(void)
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef * hadc){
     HAL_ADC_Stop_DMA(&hadc1);
     if(hadc == &hadc1){
-
         uint16_t avg = adc_buffer[0];
         output_voltage = calculate(avg);
 
@@ -238,6 +241,19 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
     }
     HAL_UART_Receive_IT(&huart3, (uint8_t *)&aRxBuffer, 1);
 	}
+}
+
+
+void HAL_I2C_MemRxCpltCallback(I2C_HandleTypeDef *hi2c){
+    if (hi2c->Instance == I2C1){
+        voice_cmd_ready = 1;
+    }
+}
+
+void HAL_I2C_ErrorCallback(I2C_HandleTypeDef *hi2c){
+    if (hi2c->Instance == I2C1){
+        Voice_I2C_Read_Start();
+    }
 }
 
 /* USER CODE END 4 */

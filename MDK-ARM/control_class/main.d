@@ -37,6 +37,7 @@ control_class\main.o: ../Core/Inc/i2c.h
 control_class\main.o: ../Core/Inc/tim.h
 control_class\main.o: ../Core/Inc/usart.h
 control_class\main.o: ../Core/Inc/gpio.h
+control_class\main.o: D:\Keil_v5arm\ARM\ARMCC\Bin\..\include\stdio.h
 control_class\main.o: ../System/pi_control.h
 control_class\main.o: ../System/highlevel_control.h
 control_class\main.o: D:\Keil_v5arm\ARM\ARMCC\Bin\..\include\string.h

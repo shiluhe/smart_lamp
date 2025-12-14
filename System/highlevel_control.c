@@ -9,6 +9,8 @@ uint8_t my_mode = 0 ;
 char my_order[10]={0};
 char receive_flag=0;
 
+volatile uint8_t voice_cmd_ready = 0; 
+uint8_t voice_rx_buffer[5] = {0};
 
 void usart_send(char* string){
     uint8_t num=0;
@@ -65,31 +67,27 @@ uint8_t esp8266_quit_trans(){
 }
 //////////////////////////////////////////////////////////////////////////////
 uint8_t yaokong(){
-	      if(receive_flag)
-      {
-          receive_flag=0;
-          if(strstr((const char*)my_order,(const char*)"1"))
-          {
-              Uart3_Rx_Cnt=0;
-              memset(RxBuffer,0x00,sizeof(RxBuffer));
-              memset(my_order,0x00,sizeof(my_order));
-							my_mode = 1 ;
-          }
-          else if(strstr((const char*)my_order,(const char*)"2"))
-          {
-              Uart3_Rx_Cnt=0;
-              memset(RxBuffer,0x00,sizeof(RxBuffer));
-              memset(my_order,0x00,sizeof(my_order));
-							my_mode = 2 ;
-          }
-          else if(strstr((const char*)my_order,(const char*)"3"))
-          {
-              Uart3_Rx_Cnt=0;
-              memset(RxBuffer,0x00,sizeof(RxBuffer)); 
-              memset(my_order,0x00,sizeof(my_order));
-							my_mode = 3 ;
-          }
+		if(receive_flag){
+			receive_flag=0;
+			if(strstr((const char*)my_order,(const char*)"1")){
+					Uart3_Rx_Cnt=0;
+					memset(RxBuffer,0x00,sizeof(RxBuffer));
+					memset(my_order,0x00,sizeof(my_order));
+					my_mode = 1 ;
 			}
+			else if(strstr((const char*)my_order,(const char*)"2")){
+					Uart3_Rx_Cnt=0;
+					memset(RxBuffer,0x00,sizeof(RxBuffer));
+					memset(my_order,0x00,sizeof(my_order));
+					my_mode = 2 ;
+			}
+			else if(strstr((const char*)my_order,(const char*)"3")){
+					Uart3_Rx_Cnt=0;
+					memset(RxBuffer,0x00,sizeof(RxBuffer)); 
+					memset(my_order,0x00,sizeof(my_order));
+					my_mode = 3 ;
+			}
+	}
 			return my_mode;
 }
 
@@ -107,9 +105,36 @@ void mode_change(uint8_t my_mode){
 		default:
 			break;
 	}	
-} 
+}
 ///////////////////////////////////////////////////////////////////
+void Voice_I2C_Read_Start(){
+    if (HAL_I2C_GetState(&hi2c1) == HAL_I2C_STATE_READY){
+        HAL_I2C_Mem_Read_IT(&hi2c1, VOICE_SLAVE_ADDR << 1, VOICE_REG_ADDR,  I2C_MEMADD_SIZE_8BIT, voice_rx_buffer,1);  			
+    }
+}
 
+void yuyin(){
+			static uint32_t last_read_time = 0;
+    if (HAL_GetTick() - last_read_time >= 100){
+        last_read_time = HAL_GetTick();
+        Voice_I2C_Read_Start();
+    }
+    if (voice_cmd_ready){
+			voice_cmd_ready = 0;
+			uint8_t cmd_id = voice_rx_buffer[0]; 
+			//char buf[100];
+			//sprintf(buf, "Voice CMD ID: %02X\r\n", cmd_id); 
+			//HAL_UART_Transmit(&huart3, (uint8_t*)buf, strlen(buf), 100);
+			if (cmd_id != 0x00){
+					if (cmd_id == 0x12){
+						on_lamp();
+					}
+					else if (cmd_id == 0x13){
+						off_lamp();
+					}
+			 }
+    }
+}
 
 
 
