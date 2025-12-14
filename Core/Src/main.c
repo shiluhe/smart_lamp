@@ -20,12 +20,15 @@
 #include "main.h"
 #include "adc.h"
 #include "dma.h"
+#include "i2c.h"
 #include "tim.h"
+#include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "pi_control.h"
+#include "highlevel_control.h"
 #include "stm32f1xx_hal.h"
 /* USER CODE END Includes */
 
@@ -63,21 +66,14 @@ uint16_t adc_buffer[2];
 float output_voltage = 0.0f;
 float light_value = 0.0f;
 
-void delay_us(uint32_t nus)
-{
- 
- uint16_t  differ = 0xffff-nus-5;
+extern char RxBuffer[RXBUFFERSIZE];  
+extern uint8_t aRxBuffer;		
+extern uint8_t Uart3_Rx_Cnt;	
+extern char my_order[10];
+extern char receive_flag;
 
-  __HAL_TIM_SetCounter(&htim2,differ);
+uint8_t Voice_ID = 0;
 
-  HAL_TIM_Base_Start(&htim2);
- 
-  while( differ<0xffff-5)
- {
-  differ = __HAL_TIM_GetCounter(&htim2);
- };
-  HAL_TIM_Base_Stop(&htim2);
-}
 /* USER CODE END 0 */
 
 /**
@@ -112,35 +108,41 @@ int main(void)
   MX_DMA_Init();
   MX_TIM1_Init();
   MX_ADC1_Init();
-  MX_TIM2_Init();
+  MX_USART3_UART_Init();
+  MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
 	HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_1);
 	HAL_ADC_Start_DMA(&hadc1, (uint32_t *) adc_buffer, 2);
+
+	HAL_UART_Receive_IT(&huart3, (uint8_t *)&aRxBuffer, 1);
+	//HAL_I2C_Master_Transmit_IT(&hi2c1, 0x34 << 1, (uint8_t *)0x64, 1);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-	
+	HAL_Delay(1000);
+	esp8266_start_trans();
 	//baoshan();
-	
+	//esp8266_test();
   while (1)
   {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
 		//__HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_1,1440);
-				PI_Control(output_voltage);
+				//PI_Control(output_voltage);
 				//HAL_Delay(1);
-				//delay_us(500);
+
 		//DO_lamp();
 		//AO_lamp(light_value);
 		//huxi_changliang();
-		//HAL_Delay(1);
-		
-  }
+		HAL_Delay(1);
+		uint8_t my_mode = yaokong();
+		mode_change(my_mode);
   /* USER CODE END 3 */
+	}
 }
-
 /**
   * @brief System Clock Configuration
   * @retval None
@@ -201,6 +203,43 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef * hadc){
 		}
     HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adc_buffer, 2);
 }
+
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+    if (huart == &huart3) {
+    if(Uart3_Rx_Cnt >= 255) 
+    {
+        Uart3_Rx_Cnt = 0;
+        memset(RxBuffer,0x00,sizeof(RxBuffer));
+    }
+    else
+    {
+        static uint8_t Uart3_count=0;
+
+        RxBuffer[Uart3_Rx_Cnt] = aRxBuffer;
+        if(receive_flag==0)
+        {
+            if(RxBuffer[Uart3_Rx_Cnt - Uart3_count] == '<')
+            {
+                Uart3_count++;
+                if((RxBuffer[Uart3_Rx_Cnt] == '>') || Uart3_count >= 14)
+                {
+                    uint8_t My_i=0;
+                    for(int i = Uart3_Rx_Cnt - Uart3_count + 1; i < Uart3_Rx_Cnt+1; i++)
+                    {
+                        my_order[My_i++]=RxBuffer[i];
+                        receive_flag=1;
+                        Uart3_count=0;
+                    }
+                }
+            }
+        }
+        Uart3_Rx_Cnt++;
+    }
+    HAL_UART_Receive_IT(&huart3, (uint8_t *)&aRxBuffer, 1);
+	}
+}
+
 /* USER CODE END 4 */
 
 /**

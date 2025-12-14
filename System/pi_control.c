@@ -100,7 +100,7 @@ void huxi_changliang(){
 
 void huxi(){
 	  static float pwm_val = 0.0f;
-    static float step = 54.0f;   
+    static float step = 72.0f;   
     pwm_val += step;
 	
 		float up_limit = 2880.0f * VlampUpLimit / VIN;
@@ -116,8 +116,16 @@ void huxi(){
         pwm_val = down_limit;
         step = -step;
     }
-		
     __HAL_TIM_SetCompare(&htim1, TIM_CHANNEL_1, (uint16_t)pwm_val);
-		HAL_Delay(25);
+		HAL_Delay(24);
 }
 
+void on_lamp(){
+	float up_limit =  2880.0f * VlampUpLimit / VIN;
+	__HAL_TIM_SetCompare(&htim1, TIM_CHANNEL_1, up_limit);
+		
+}
+
+void off_lamp(){
+		__HAL_TIM_SetCompare(&htim1, TIM_CHANNEL_1, 0);
+}

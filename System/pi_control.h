@@ -18,7 +18,8 @@ void AO_lamp(float light_value);
 void baoshan(void);
 void huxi_changliang(void);
 void huxi(void);
-
+void on_lamp(void);
+void off_lamp(void);
 	
 
 
