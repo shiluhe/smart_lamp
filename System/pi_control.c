@@ -39,6 +39,7 @@ void PI_Control(float output_voltage)
     __HAL_TIM_SetCompare(&htim1, TIM_CHANNEL_1, (uint32_t)pwm);
 }
 
+// ------------------------ 光电传感 --------------------------------------
 void DO_lamp(){
 	GPIO_PinState state = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_7);
 	if(state == GPIO_PIN_SET){
@@ -52,23 +53,13 @@ void AO_lamp(float light_value){
 	float pwm = 0.0f;
 	pwm = light_value * 1440.0f / VREF;
 	float up_limit = 2880.0f * VlampUpLimit / VIN;
-	
+
 	if(pwm > up_limit){
 		pwm = up_limit;
 	}
 	__HAL_TIM_SetCompare(&htim1, TIM_CHANNEL_1, pwm);	
 }
-
-void baoshan(){
-	while(1){
-		float up_limit =  2880.0f * VlampUpLimit / VIN;
-		__HAL_TIM_SetCompare(&htim1, TIM_CHANNEL_1, up_limit);
-		HAL_Delay(50);
-		__HAL_TIM_SetCompare(&htim1, TIM_CHANNEL_1, 0);	
-		HAL_Delay(50);
-	}
-}
-
+// ------------------------ lamp --------------------------------------
 void huxi_changliang(){
 		GPIO_PinState state = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_7);
 	if(state == GPIO_PIN_SET){
@@ -96,6 +87,14 @@ void huxi_changliang(){
     __HAL_TIM_SetCompare(&htim1, TIM_CHANNEL_1, (uint16_t)pwm_val);
 		HAL_Delay(24);
 	}
+}
+
+void baoshan(){
+		float up_limit =  2880.0f * VlampUpLimit / VIN;
+		__HAL_TIM_SetCompare(&htim1, TIM_CHANNEL_1, up_limit);
+		HAL_Delay(50);
+		__HAL_TIM_SetCompare(&htim1, TIM_CHANNEL_1, 0);	
+		HAL_Delay(50);
 }
 
 void huxi(){

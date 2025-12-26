@@ -18,4 +18,4 @@ uint8_t yaokong(void);
 void mode_change(uint8_t my_mode);
 
 void Voice_I2C_Read_Start(void);
-void yuyin(void);
+uint8_t yuyin(void);

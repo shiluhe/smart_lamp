@@ -6,11 +6,14 @@ char RxBuffer[RXBUFFERSIZE];
 uint8_t aRxBuffer;		
 uint8_t Uart3_Rx_Cnt = 0;	
 uint8_t my_mode = 0 ;
+
 char my_order[10]={0};
 char receive_flag=0;
 
 volatile uint8_t voice_cmd_ready = 0; 
 uint8_t voice_rx_buffer[5] = {0};
+
+float light_value = 0.0f;
 
 void usart_send(char* string){
     uint8_t num=0;
@@ -87,6 +90,24 @@ uint8_t yaokong(){
 					memset(my_order,0x00,sizeof(my_order));
 					my_mode = 3 ;
 			}
+			else if(strstr((const char*)my_order,(const char*)"4")){
+					Uart3_Rx_Cnt=0;
+					memset(RxBuffer,0x00,sizeof(RxBuffer)); 
+					memset(my_order,0x00,sizeof(my_order));
+					my_mode = 4 ;
+		}
+			else if(strstr((const char*)my_order,(const char*)"5")){
+					Uart3_Rx_Cnt=0;
+					memset(RxBuffer,0x00,sizeof(RxBuffer)); 
+					memset(my_order,0x00,sizeof(my_order));
+					my_mode = 5 ;
+		}
+			else if(strstr((const char*)my_order,(const char*)"6")){
+					Uart3_Rx_Cnt=0;
+					memset(RxBuffer,0x00,sizeof(RxBuffer)); 
+					memset(my_order,0x00,sizeof(my_order));
+					my_mode = 6 ;
+		}
 	}
 			return my_mode;
 }
@@ -102,6 +123,12 @@ void mode_change(uint8_t my_mode){
 		case 3:
 				on_lamp();
 			break;
+		case 4:
+			  baoshan();
+		case 5:
+				DO_lamp();
+		case 6:
+				AO_lamp(light_value);
 		default:
 			break;
 	}	
@@ -112,10 +139,9 @@ void Voice_I2C_Read_Start(){
         HAL_I2C_Mem_Read_IT(&hi2c1, VOICE_SLAVE_ADDR << 1, VOICE_REG_ADDR,  I2C_MEMADD_SIZE_8BIT, voice_rx_buffer,1);  			
     }
 }
-
-void yuyin(){
+uint8_t yuyin(){
 			static uint32_t last_read_time = 0;
-    if (HAL_GetTick() - last_read_time >= 100){
+    if (HAL_GetTick() - last_read_time >= 50){
         last_read_time = HAL_GetTick();
         Voice_I2C_Read_Start();
     }
@@ -127,14 +153,22 @@ void yuyin(){
 			//HAL_UART_Transmit(&huart3, (uint8_t*)buf, strlen(buf), 100);
 			if (cmd_id != 0x00){
 					if (cmd_id == 0x12){
-						on_lamp();
+						my_mode = 3;
 					}
 					else if (cmd_id == 0x13){
-						off_lamp();
+						my_mode = 2;
 					}
-			 }
+					else if (cmd_id == 0x7C){
+						my_mode = 1;
+					}
+					else if (cmd_id == 0x7D){
+						my_mode = 4;
+					}
+			 }	
     }
+		return my_mode;
 }
+
 
 
 

@@ -8,7 +8,7 @@
 #define VOLTAGE_SCALE     ((R1 + R2) / R1)
 #define TARGET_VOLTAGE    (12.0f)
 #define VIN               24.0f
-#define VlampUpLimit      12.0f
+#define VlampUpLimit      14.0f
 extern TIM_HandleTypeDef htim1;
 
 float calculate(uint16_t raw_adc);

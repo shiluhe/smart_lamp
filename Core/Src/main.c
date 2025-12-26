@@ -65,13 +65,14 @@ void SystemClock_Config(void);
 /* USER CODE BEGIN 0 */
 uint16_t adc_buffer[2];
 float output_voltage = 0.0f;
-float light_value = 0.0f;
+extern float light_value;
 
 extern char RxBuffer[RXBUFFERSIZE];  
 extern uint8_t aRxBuffer;		
 extern uint8_t Uart3_Rx_Cnt;	
 extern char my_order[10];
 extern char receive_flag;
+extern uint8_t my_mode;
 
 extern uint8_t voice_cmd_ready;
 //extern uint8_t voice_rx_buffer[5];
@@ -122,8 +123,8 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-	//HAL_Delay(1000);
-	//esp8266_start_trans();
+	HAL_Delay(1000);
+	esp8266_start_trans();
 	//baoshan();
   while (1)
   {
@@ -139,10 +140,10 @@ int main(void)
 		//AO_lamp(light_value);
 		//huxi_changliang();
 		//HAL_Delay(1);
-		//uint8_t my_mode = yaokong();
-		//mode_change(my_mode);
-		//yuyin();
-		
+		yaokong();
+		yuyin();
+		mode_change(my_mode);
+
 	}
   /* USER CODE END 3 */
 }
