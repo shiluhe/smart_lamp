@@ -6,6 +6,7 @@ char RxBuffer[RXBUFFERSIZE];
 uint8_t aRxBuffer;		
 uint8_t Uart3_Rx_Cnt = 0;	
 uint8_t my_mode = 0 ;
+uint8_t my_mode_motor = 0;
 
 char my_order[10]={0};
 char receive_flag=0;
@@ -14,6 +15,7 @@ volatile uint8_t voice_cmd_ready = 0;
 uint8_t voice_rx_buffer[5] = {0};
 
 float light_value = 0.0f;
+float output_voltage = 0.0f;
 
 void usart_send(char* string){
     uint8_t num=0;
@@ -108,31 +110,28 @@ uint8_t yaokong(){
 					memset(my_order,0x00,sizeof(my_order));
 					my_mode = 6 ;
 		}
+			else if(strstr((const char*)my_order,(const char*)"7")){
+					Uart3_Rx_Cnt=0;
+					memset(RxBuffer,0x00,sizeof(RxBuffer)); 
+					memset(my_order,0x00,sizeof(my_order));
+					my_mode = 7 ;
+		}
+			else if(strstr((const char*)my_order,(const char*)"8")){
+					Uart3_Rx_Cnt=0;
+					memset(RxBuffer,0x00,sizeof(RxBuffer)); 
+					memset(my_order,0x00,sizeof(my_order));
+					my_mode_motor = 1;
+		}
+			else if(strstr((const char*)my_order,(const char*)"9")){
+					Uart3_Rx_Cnt=0;
+					memset(RxBuffer,0x00,sizeof(RxBuffer)); 
+					memset(my_order,0x00,sizeof(my_order));
+					my_mode_motor = 0 ;
+		}
 	}
 			return my_mode;
 }
 
-void mode_change(uint8_t my_mode){
-	switch(my_mode){
-		case 1:
-				huxi();
-			break;
-		case 2:
-				off_lamp();
-			break;
-		case 3:
-				on_lamp();
-			break;
-		case 4:
-			  baoshan();
-		case 5:
-				DO_lamp();
-		case 6:
-				AO_lamp(light_value);
-		default:
-			break;
-	}	
-}
 ///////////////////////////////////////////////////////////////////
 void Voice_I2C_Read_Start(){
     if (HAL_I2C_GetState(&hi2c1) == HAL_I2C_STATE_READY){
@@ -149,7 +148,7 @@ uint8_t yuyin(){
 			voice_cmd_ready = 0;
 			uint8_t cmd_id = voice_rx_buffer[0]; 
 			//char buf[100];
-			//sprintf(buf, "Voice CMD ID: %02X\r\n", cmd_id); 
+			//sprintf(buf, "Voice_ID: %02X\r\n", cmd_id); 
 			//HAL_UART_Transmit(&huart3, (uint8_t*)buf, strlen(buf), 100);
 			if (cmd_id != 0x00){
 					if (cmd_id == 0x12){
@@ -164,11 +163,65 @@ uint8_t yuyin(){
 					else if (cmd_id == 0x7D){
 						my_mode = 4;
 					}
+					else if (cmd_id == 0x7E){
+						my_mode = 5;
+					}
+					else if (cmd_id == 0x7F){
+						my_mode = 6;
+					}
+					else if (cmd_id == 0x7B){
+						my_mode = 7;
+					}
+					else if (cmd_id == 0x1E){
+						my_mode_motor = 1;
+					}
+					else if (cmd_id == 0x09){
+						my_mode_motor = 0;
+					}
 			 }	
     }
 		return my_mode;
 }
-
+///////////////////////////////////////////////////////////////////////
+void mode_change(uint8_t my_mode){
+	switch(my_mode){
+		case 1:
+				huxi();
+			break;
+		case 2:
+				off_lamp();
+			break;
+		case 3:
+				on_lamp();
+			break;
+		case 4:
+			  baoshan();
+			break;
+		case 5:
+				DO_lamp();
+			break;
+		case 6:
+				AO_lamp(light_value);
+			break;
+		case 7:
+				huxi_changliang();
+			break;
+		default:
+			break;
+	}
+}
+void mode_change_motor(uint8_t my_mode_motor){
+	switch(my_mode_motor){
+		case 0:
+				motor_stop();
+			break;
+		case 1:
+				yaotou(1600,1800);
+			break;
+		default:
+			break;
+	}
+}
 
 
 

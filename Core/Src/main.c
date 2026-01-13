@@ -64,7 +64,7 @@ void SystemClock_Config(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 uint16_t adc_buffer[2];
-float output_voltage = 0.0f;
+extern float output_voltage;
 extern float light_value;
 
 extern char RxBuffer[RXBUFFERSIZE];  
@@ -73,6 +73,7 @@ extern uint8_t Uart3_Rx_Cnt;
 extern char my_order[10];
 extern char receive_flag;
 extern uint8_t my_mode;
+extern uint8_t my_mode_motor;
 
 extern uint8_t voice_cmd_ready;
 //extern uint8_t voice_rx_buffer[5];
@@ -113,8 +114,10 @@ int main(void)
   MX_ADC1_Init();
   MX_USART3_UART_Init();
   MX_I2C1_Init();
+  MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
 	HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_1);
+	HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_1);
 	HAL_ADC_Start_DMA(&hadc1, (uint32_t *) adc_buffer, 2);
 
 	HAL_UART_Receive_IT(&huart3, (uint8_t *)&aRxBuffer, 1);
@@ -143,7 +146,8 @@ int main(void)
 		yaokong();
 		yuyin();
 		mode_change(my_mode);
-
+		mode_change_motor(my_mode_motor);
+		HAL_Delay(1);
 	}
   /* USER CODE END 3 */
 }

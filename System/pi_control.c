@@ -3,6 +3,7 @@
 float Kp = 110.0f;
 float Ki = 25.2f;
 float integral = 0.0f;
+extern float output_voltage;
 
 float calculate(uint16_t raw_adc)
 {
@@ -51,7 +52,7 @@ void DO_lamp(){
 
 void AO_lamp(float light_value){
 	float pwm = 0.0f;
-	pwm = light_value * 1440.0f / VREF;
+	pwm = light_value * 2880.0f / VREF;
 	float up_limit = 2880.0f * VlampUpLimit / VIN;
 
 	if(pwm > up_limit){
@@ -63,7 +64,8 @@ void AO_lamp(float light_value){
 void huxi_changliang(){
 		GPIO_PinState state = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_7);
 	if(state == GPIO_PIN_SET){
-		__HAL_TIM_SetCompare(&htim1, TIM_CHANNEL_1, 2880.0f * 12 / VIN);
+		//__HAL_TIM_SetCompare(&htim1, TIM_CHANNEL_1, 2880.0f * 12 / VIN);
+		PI_Control(output_voltage);
 	}
 	else{
 	  static float pwm_val = 0.0f;
@@ -83,7 +85,6 @@ void huxi_changliang(){
         pwm_val = down_limit;
         step = -step;
     }
-		
     __HAL_TIM_SetCompare(&htim1, TIM_CHANNEL_1, (uint16_t)pwm_val);
 		HAL_Delay(24);
 	}
@@ -121,10 +122,31 @@ void huxi(){
 
 void on_lamp(){
 	float up_limit =  2880.0f * VlampUpLimit / VIN;
-	__HAL_TIM_SetCompare(&htim1, TIM_CHANNEL_1, up_limit);
-		
+	__HAL_TIM_SetCompare(&htim1, TIM_CHANNEL_1, up_limit);	
 }
 
 void off_lamp(){
 		__HAL_TIM_SetCompare(&htim1, TIM_CHANNEL_1, 0);
+}
+// ------------------------ motor --------------------------------------
+void yaotou(uint16_t place1, uint16_t place2){
+	static uint16_t pwm_val = 0;
+	static uint16_t step1 = 5;
+	pwm_val += step1;
+	if (pwm_val == 0){
+    pwm_val = (place1 + place2) / 2;
+  }
+	if(pwm_val >= place2){
+		pwm_val = place2;
+		step1 = -step1;
+	}
+	else if(pwm_val <= place1){
+		pwm_val = place1;
+		step1 = -step1;
+	}
+	__HAL_TIM_SetCompare(&htim3, TIM_CHANNEL_1, pwm_val);
+	HAL_Delay(40);
+}
+void motor_stop(){
+	__HAL_TIM_SetCompare(&htim3, TIM_CHANNEL_1, 1700);
 }

@@ -7,9 +7,10 @@
 #define R2                50000.0f
 #define VOLTAGE_SCALE     ((R1 + R2) / R1)
 #define TARGET_VOLTAGE    (12.0f)
-#define VIN               24.0f
-#define VlampUpLimit      14.0f
+#define VIN               19.0f
+#define VlampUpLimit      12.0f
 extern TIM_HandleTypeDef htim1;
+extern TIM_HandleTypeDef htim3;
 
 float calculate(uint16_t raw_adc);
 void PI_Control(float output_voltage);
@@ -20,6 +21,7 @@ void huxi_changliang(void);
 void huxi(void);
 void on_lamp(void);
 void off_lamp(void);
-	
+void yaotou(uint16_t place1, uint16_t place2);
+void motor_stop(void);
 
 
