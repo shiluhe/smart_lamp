@@ -10,3 +10,5 @@
 **2.扩展功能：**
 
 手机遥控ESP8266 + 语音交互模块
+
+B站展示视频：https://www.bilibili.com/video/BV1zSrzB2EN7/?share_source=copy_web&vd_source=e04fab70977b1b2117cf35c1a17faa06
